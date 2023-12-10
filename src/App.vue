@@ -1,74 +1,81 @@
 <template>
-  <div class="container">
-    <h1>TD</h1>
-    <form
-      @submit.prevent="onSubmit">
-      <div class="d-flex">
-        <div class="flex-grow-1 mr-2">
-          <input
-            class="form-control"
-            type="text"
-            v-model="todo"
-            placeholder="Type new To do">
-        </div>
-        <div>
-          <button class="btn btn-primary">Add</button>
-        </div>
-      </div>
-      <div
-        class="error-message"
-        v-show="hasError">
-        This field cannot be empty.
-      </div>
-    </form>
-    <template v-for="item in todos" :key="item.id">
-      <div class="card mt-2">
-        <div class="card-body p-2">
-          <div class="form-check">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              v-model="item.complated">
-            <label class="form-check-label">{{ item.subject }}</label>
-          </div>
-        </div>
-      </div>
-    </template>
+  <div class="container pt-5">
+    <h1>To Do</h1>
+
+    <input
+      class="form-control"
+      type="text"
+      v-model="searchText"
+      placeholder="Search">
+    <hr>
+
+    <TodoSimpleForm @add-todo="addTodo" />
+
+    <div v-if="filteredTodos.length === 0">
+      <hr>
+      <div class="text-center">표시할 항목이 없습니다.</div>
+      <hr>
+    </div>
+
+    <TodoList
+      :todos="filteredTodos"
+      @toggle-todo="toggleTodo"
+      @delete-todo="deleteTodo"/>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import TodoSimpleForm from './components/TodoSimpleForm.vue';
+import TodoList from './components/TodoList.vue'
 
 export default {
-  setup() {
 
-    const todo = ref('');
+  components: {
+    TodoSimpleForm,
+    TodoList
+  },
+
+  setup() {
 
     const todos = ref([]);
 
-    const hasError = ref(false);
+    const searchText = ref('');
 
-    const onSubmit = () => {
-      if (todo.value === '') {
-        hasError.value = true;
-        return;
+    const filteredTodos = computed(() => {
+      if (searchText.value) {
+        return todos.value.filter((item) => {
+          return item.subject.includes(searchText.value)
+        });
       }
+      return todos.value;
+    })
 
-      todos.value.push({
-        id: Date.now(),
-        subject: todo.value,
-        complated: false
-      })
-      todo.value = '';
-      hasError.value = false;
+    const todoStyle = {
+      textDecoration: 'line-through',
+      color: 'gray'
+    }
+
+    const toggleTodo = (index) => {
+      todos.value[index].complated = !todos.value[index].complated
+    }
+
+    const deleteTodo = (index) => {
+      todos.value.splice(index, 1);
+    }
+
+    const addTodo = (data) => {
+      todos.value.push(data)
     }
 
     return {
-      todo,
       todos,
-      hasError,
-      onSubmit
+      filteredTodos,
+      addTodo,
+      toggleTodo,
+      deleteTodo,
+      todoStyle,
+      searchText,
     }
   }
 }
@@ -77,5 +84,9 @@ export default {
 <style>
 .error-message {
   color: red;
+}
+.todo-complated {
+  text-decoration: line-through;
+  color: gray;
 }
 </style>
