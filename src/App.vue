@@ -25,9 +25,10 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import TodoSimpleForm from './components/TodoSimpleForm.vue';
 import TodoList from './components/TodoList.vue'
+import axios from 'axios'
 
 export default {
 
@@ -56,22 +57,63 @@ export default {
       color: 'gray'
     }
 
-    const toggleTodo = (index) => {
+    const toggleTodo = async (index) => {
+      try {
+        await axios.patch(`http://localhost:3000/todos/${todos.value[index].id}`, {
+          complated: !todos.value[index].complated
+        })
+      } catch (err) {
+        console.error(err);
+        alert('변경 사항 반영에 실패하였습니다.')
+      }
+
       todos.value[index].complated = !todos.value[index].complated
     }
 
-    const deleteTodo = (index) => {
-      todos.value.splice(index, 1);
+    const deleteTodo = async (index) => {
+      try {
+        await axios.delete(`http://localhost:3000/todos/${todos.value[index].id}`);
+        todos.value.splice(index, 1);
+      } catch (err) {
+        console.error(err);
+        alert('삭제에 실패하였습니다.')
+      }
+
     }
 
-    const addTodo = (data) => {
-      todos.value.push(data)
+    const addTodo = async(data) => {
+      // 데이터베이스에 저장
+      try {
+      const res = await axios.post('http://localhost:3000/todos', {
+          subject: data.subject,
+          complated: data.complated
+        })
+        todos.value.push(res.data)
+      } catch(err) {
+        console.error(err);
+        alert('저장에 실패하였습니다.')
+      }
     }
+
+    const getTodos = async () => {
+      try {
+        const res = await axios.get('http://localhost:3000/todos')
+        todos.value = res.data
+      } catch (err) {
+        console.error(err);
+        alert('목록을 가져오는데 실패하였습니다.')
+      }
+    }
+
+    onMounted(() => {
+      getTodos();
+    })
 
     return {
       todos,
       filteredTodos,
       addTodo,
+      getTodos,
       toggleTodo,
       deleteTodo,
       todoStyle,

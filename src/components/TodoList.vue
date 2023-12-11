@@ -6,7 +6,7 @@
             <input
               class="form-check-input"
               type="checkbox"
-              :value="item.complated"
+              :checked="item.complated"
               @change="toggleTodo(index)">
             <label
               class="form-check-label"
