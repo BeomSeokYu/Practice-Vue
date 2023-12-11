@@ -21,6 +21,30 @@
       :todos="filteredTodos"
       @toggle-todo="toggleTodo"
       @delete-todo="deleteTodo"/>
+
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        <li
+          class="page-item"
+          :class="currentPage === 1 ? 'disabled' : ''"
+          @click="currentPage > 1 ? getTodos(currentPage - 1) : null"
+        ><a class="page-link" href="#">Prev</a>
+        </li>
+        <li
+          class="page-item"
+          v-for="page in numberOfPages"
+          :class="currentPage === page ? 'active' : ''"
+          :key="page">
+          <a class="page-link" @click="getTodos(page)">{{ page }}</a>
+        </li>
+        <li
+          class="page-item"
+          :class="currentPage === numberOfPages ? 'disabled' : ''"
+          @click="currentPage < numberOfPages ? getTodos(currentPage + 1) : null"
+          ><a class="page-link" href="#">Next</a>
+        </li>
+      </ul>
+    </nav>
   </div>
 </template>
 
@@ -41,7 +65,17 @@ export default {
 
     const todos = ref([]);
 
+    const totalCount = ref(0);
+
+    const limit = ref(5);
+
+    const currentPage = ref(1);
+
     const searchText = ref('');
+
+    const numberOfPages = computed(() => {
+      return Math.ceil(totalCount.value / limit.value);
+    })
 
     const filteredTodos = computed(() => {
       if (searchText.value) {
@@ -95,13 +129,14 @@ export default {
       }
     }
 
-    const getTodos = async () => {
+    const getTodos = async (page = currentPage.value) => {
+      currentPage.value = page;
       try {
-        const res = await axios.get('http://localhost:3000/todos')
-        todos.value = res.data
+        const res = await axios.get(`http://localhost:3000/todos?_page=${currentPage.value}&_limit=${limit.value}`)
+        todos.value = res.data;
+        totalCount.value = res.headers['x-total-count']
       } catch (err) {
         console.error(err);
-        alert('목록을 가져오는데 실패하였습니다.')
       }
     }
 
@@ -118,6 +153,8 @@ export default {
       deleteTodo,
       todoStyle,
       searchText,
+      numberOfPages,
+      currentPage,
     }
   }
 }
@@ -130,5 +167,8 @@ export default {
 .todo-complated {
   text-decoration: line-through;
   color: gray;
+}
+.page-link {
+  cursor: pointer;
 }
 </style>
