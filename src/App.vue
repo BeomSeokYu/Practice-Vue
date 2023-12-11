@@ -32,15 +32,15 @@
         </li>
         <li
           class="page-item"
-          v-for="page in numberOfPages"
+          v-for="page in totalPages"
           :class="currentPage === page ? 'active' : ''"
           :key="page">
           <a class="page-link" @click="getTodos(page)">{{ page }}</a>
         </li>
         <li
           class="page-item"
-          :class="currentPage === numberOfPages ? 'disabled' : ''"
-          @click="currentPage < numberOfPages ? getTodos(currentPage + 1) : null"
+          :class="currentPage === totalPages ? 'disabled' : ''"
+          @click="currentPage < totalPages ? getTodos(currentPage + 1) : null"
           ><a class="page-link" href="#">Next</a>
         </li>
       </ul>
@@ -73,7 +73,7 @@ export default {
 
     const searchText = ref('');
 
-    const numberOfPages = computed(() => {
+    const totalPages = computed(() => {
       return Math.ceil(totalCount.value / limit.value);
     })
 
@@ -107,7 +107,9 @@ export default {
     const deleteTodo = async (index) => {
       try {
         await axios.delete(`http://localhost:3000/todos/${todos.value[index].id}`);
-        todos.value.splice(index, 1);
+        getTodos(totalCount.value % limit.value === 1
+          ? currentPage.value - 1
+          : currentPage.value);
       } catch (err) {
         console.error(err);
         alert('삭제에 실패하였습니다.')
@@ -118,11 +120,13 @@ export default {
     const addTodo = async(data) => {
       // 데이터베이스에 저장
       try {
-      const res = await axios.post('http://localhost:3000/todos', {
+      await axios.post('http://localhost:3000/todos', {
           subject: data.subject,
           complated: data.complated
         })
-        todos.value.push(res.data)
+        getTodos(totalCount.value % limit.value === 0
+          ? currentPage.value + 1
+          : currentPage.value);
       } catch(err) {
         console.error(err);
         alert('저장에 실패하였습니다.')
@@ -153,7 +157,7 @@ export default {
       deleteTodo,
       todoStyle,
       searchText,
-      numberOfPages,
+      totalPages,
       currentPage,
     }
   }
