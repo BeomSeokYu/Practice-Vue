@@ -6,19 +6,20 @@
       class="form-control"
       type="text"
       v-model="searchText"
-      placeholder="Search">
+      placeholder="Search"
+      @keyup.enter="searchTodo">
     <hr>
 
     <TodoSimpleForm @add-todo="addTodo" />
 
-    <div v-if="filteredTodos.length === 0">
+    <div v-if="todos.length === 0">
       <hr>
       <div class="text-center">표시할 항목이 없습니다.</div>
       <hr>
     </div>
 
     <TodoList
-      :todos="filteredTodos"
+      :todos="todos"
       @toggle-todo="toggleTodo"
       @delete-todo="deleteTodo"/>
 
@@ -49,7 +50,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import TodoSimpleForm from './components/TodoSimpleForm.vue';
 import TodoList from './components/TodoList.vue'
 import axios from 'axios'
@@ -73,18 +74,32 @@ export default {
 
     const searchText = ref('');
 
+    let timeout = null;
+    watch(searchText, () => {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        console.log('search');
+        getTodos(1, limit.value)
+      }, 2000);
+    })
+
+    const searchTodo = () => {
+      clearTimeout(timeout);
+      getTodos(1);
+    }
+
     const totalPages = computed(() => {
       return Math.ceil(totalCount.value / limit.value);
     })
 
-    const filteredTodos = computed(() => {
-      if (searchText.value) {
-        return todos.value.filter((item) => {
-          return item.subject.includes(searchText.value)
-        });
-      }
-      return todos.value;
-    })
+    // const filteredTodos = computed(() => {
+    //   if (searchText.value) {
+    //     return todos.value.filter((item) => {
+    //       return item.subject.includes(searchText.value)
+    //     });
+    //   }
+    //   return todos.value;
+    // })
 
     const todoStyle = {
       textDecoration: 'line-through',
@@ -124,19 +139,18 @@ export default {
           subject: data.subject,
           complated: data.complated
         })
-        getTodos(totalCount.value % limit.value === 0
-          ? currentPage.value + 1
-          : currentPage.value);
+        getTodos(1);
       } catch(err) {
         console.error(err);
         alert('저장에 실패하였습니다.')
       }
     }
 
-    const getTodos = async (page = currentPage.value) => {
+    const getTodos = async (page = currentPage.value, lim = 5) => {
       currentPage.value = page;
+      limit.value = lim;
       try {
-        const res = await axios.get(`http://localhost:3000/todos?_page=${currentPage.value}&_limit=${limit.value}`)
+        const res = await axios.get(`http://localhost:3000/todos?_sort=id&_order=desc&_page=${currentPage.value}&_limit=${limit.value}&subject_like=${searchText.value}`)
         todos.value = res.data;
         totalCount.value = res.headers['x-total-count']
       } catch (err) {
@@ -150,11 +164,12 @@ export default {
 
     return {
       todos,
-      filteredTodos,
+      // filteredTodos,
       addTodo,
       getTodos,
       toggleTodo,
       deleteTodo,
+      searchTodo,
       todoStyle,
       searchText,
       totalPages,
