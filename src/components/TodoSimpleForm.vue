@@ -16,7 +16,7 @@
     <div
         class="error-message"
         v-show="hasError">
-        입력이 필요합니다.
+        추가 할 Todo를 입력하세요
     </div>
 </form>
 </template>
