@@ -20,8 +20,9 @@
             </div> -->
             <Input
                 label="Todo Subject"
-                v-model:subject="todo.subject"
-                :error="subjectError"/>
+                v-model="todo.subject"
+                :error="subjectError"
+                placeholder="할 일 입력" />
         </div>
         <div class="col-6">
             <div class="form-group">
@@ -52,15 +53,25 @@
             </div>
         </div>
     </div>
-    <button class="btn btn-primary"
-        @click="editing ? updateTodo() : createTodo()"
-        :disabled="!isTodoUpdated">
-        {{ editing ? 'update' : 'create' }}
-    </button>
-    <button class="btn btn-outline-dark ml-2"
-        @click="moveToTodoList">
-        cancel
-    </button>
+    <div class="d-flex">
+        <div class="flex-grow-1">
+            <button class="btn btn-primary"
+                @click="editing ? updateTodo() : createTodo()"
+                :disabled="!isTodoUpdated">
+                {{ editing ? 'update' : 'create' }}
+            </button>
+            <button class="btn btn-outline-dark ml-2"
+                @click="moveToTodoList">
+                cancel
+            </button>
+        </div>
+        <div v-if="editing">
+            <button class="btn btn-outline-danger"
+                @click="openModal">
+                delete
+            </button>
+        </div>
+    </div>
   </form>
   <transition name="fade">
       <Toast
@@ -68,22 +79,29 @@
         :message="toastMessage"
         :isError="isToastError"/>
   </transition>
+    <modal
+        v-if="showModal"
+        @close="closeModal"
+        @delete="deleteTodo">
+    </modal>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from '@/axios/axios';
 import { useRoute, useRouter } from 'vue-router'
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import _ from 'lodash';
 import Toast from '@/components/Toast.vue'
 import { useToast } from '@/composables/toast';
 import Input from '@/components/Input.vue'
+import Modal from '@/components/Modal.vue'
 
 export default {
 
     components: {
         Toast,
-        Input
+        Input,
+        Modal
     },
 
     props: {
@@ -137,7 +155,7 @@ export default {
         const getTodo = async () => {
             loading.value = true;
             try {
-                const res = await axios.get(`http://localhost:3000/todos/${todoId}`);
+                const res = await axios.get(`/todos/${todoId}`);
                 todo.value = { ...res.data };
                 originalTodo.value = { ...res.data };
                 loading.value = false;
@@ -163,7 +181,7 @@ export default {
                 return
             }
             try {
-                await axios.put(`http://localhost:3000/todos/${todoId}`, {
+                await axios.put(`/todos/${todoId}`, {
                     subject: todo.value.subject,
                     complated: todo.value.complated,
                     body: todo.value.body
@@ -183,16 +201,38 @@ export default {
             }
 
             try {
-                await axios.post(`http://localhost:3000/todos`, {
+                await axios.post(`/todos`, {
                     subject: todo.value.subject,
                     complated: todo.value.complated,
                     body: todo.value.body
                 });
+                triggerToast("저장되었습니다.");
                 moveToTodoList();
             } catch (err) {
                 console.error(err);
                 triggerToast("저장에 실패하였습니다.", true);
             }
+        }
+
+
+        const showModal = ref(false);
+        const deleteTodo = async () => {
+            try {
+                await axios.delete(`/todos/${todoId}`);
+                triggerToast('삭제되었습니다.')
+                moveToTodoList();
+            } catch (err) {
+                console.error(err);
+                triggerToast('삭제에 실패하였습니다.', true)
+            }
+        }
+
+        const openModal = () => {
+            showModal.value = true;
+        }
+
+        const closeModal = () => {
+            showModal.value = false;
         }
 
         onMounted(() => {
@@ -211,10 +251,14 @@ export default {
             toastMessage,
             isToastError,
             subjectError,
+            showModal,
             toggleTodoStatus,
             moveToTodoList,
             updateTodo,
             createTodo,
+            deleteTodo,
+            openModal,
+            closeModal,
         }
     }
 }

@@ -1,11 +1,24 @@
-import { ref } from 'vue'
+import { computed } from 'vue'
+import { useStore } from 'vuex'
 
 export const useToast = () => {
+    const store = useStore();
 
-    const showToast = ref(false);
-    const toastMessage = ref('');
-    const isToastError = ref(false);
-    const toastTimeout = ref(null);
+    const showToast = computed(() => {
+        return store.state.showToast
+    })
+
+    const toastMessage = computed(() => {
+        return store.state.toastMessage
+    })
+
+    const isToastError = computed(() => {
+        return store.state.isToastError
+    })
+
+    const toastTimeout = computed(() => {
+        return store.state.toastTimeout
+    })
 
     const triggerToast = (message, isError = false) => {
         toastMessage.value = message

@@ -2,9 +2,11 @@
 <template>
   <div class="form-group">
         <label>{{ label }}</label>
-        <input type="text"
+        <input
             class="form-control"
-            :value="subject"
+            :type="type"
+            :value="modelValue"
+            :placeholder="placeholder"
             @input="onInput">
     </div>
     <div
@@ -15,26 +17,36 @@
 </template>
 
 <script>
+import { getCurrentInstance } from 'vue';
 export default {
     props: {
         label: {
             type: String,
-            required: true
+            default: ''
+        },
+        type: {
+            type: String,
+            default: 'text'
+        },
+        placeholder: {
+            type: String,
+            default: ''
         },
         error: {
             type: String,
-            required: true
+            default: ''
         },
-        subject: {
+        modelValue: {
             type: String,
-            required: true
+            default: ''
         }
     },
 
-    setup(props, { emit }) {
+    setup() {
+        const { emit } = getCurrentInstance();
         const onInput = (e) => {
             console.log(e.target.value);
-            emit('update:subject', e.target.value);
+            emit('update:modelValue', e.target.value);
         }
 
         return {

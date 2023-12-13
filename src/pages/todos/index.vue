@@ -65,7 +65,7 @@
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue';
 import TodoSimpleForm from '@/components/TodoSimpleForm.vue';
 import TodoList from '@/components/TodoList.vue'
-import axios from 'axios'
+import axios from '@/axios/axios'
 import Toast from '@/components/Toast.vue'
 import {useToast } from '@/composables/toast'
 
@@ -142,7 +142,7 @@ export default {
 
     const toggleTodo = async (index, checked) => {
       try {
-        await axios.patch(`http://localhost:3000/todos/${todos.value[index].id}`, {
+        await axios.patch(`/todos/${todos.value[index].id}`, {
           complated: checked
         })
       } catch (err) {
@@ -155,7 +155,7 @@ export default {
 
     const deleteTodo = async (id) => {
       try {
-        await axios.delete(`http://localhost:3000/todos/${id}`);
+        await axios.delete(`/todos/${id}`);
         getTodos(totalCount.value % limit.value === 1
           ? currentPage.value - 1
           : currentPage.value);
@@ -170,7 +170,7 @@ export default {
     const addTodo = async(data) => {
       // 데이터베이스에 저장
       try {
-      await axios.post('http://localhost:3000/todos', {
+      await axios.post('/todos', {
           subject: data.subject,
           complated: data.complated
         })
@@ -185,7 +185,7 @@ export default {
       currentPage.value = page;
       limit.value = lim;
       try {
-        const res = await axios.get(`http://localhost:3000/todos?_sort=id&_order=desc&_page=${currentPage.value}&_limit=${limit.value}&subject_like=${searchText.value}`)
+        const res = await axios.get(`/todos?_sort=id&_order=desc&_page=${currentPage.value}&_limit=${limit.value}&subject_like=${searchText.value}`)
         todos.value = res.data;
         totalCount.value = res.headers['x-total-count']
       } catch (err) {

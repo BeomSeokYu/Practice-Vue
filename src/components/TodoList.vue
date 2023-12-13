@@ -26,7 +26,7 @@
     </template>
       <!-- </template> -->
   </List>
-  <teleport to="#modal">
+  <teleport to="#top">
     <modal
       v-if="showModal"
       @close="closeModal"
@@ -39,7 +39,7 @@
 import { useRouter } from 'vue-router'
 import Modal from '@/components/Modal.vue'
 import List from '@/components/List.vue'
-import { ref } from 'vue'
+import { getCurrentInstance, ref } from 'vue'
 
 export default {
 
@@ -52,7 +52,8 @@ export default {
     List,
   },
 
-  setup(props, { emit }) {
+  setup() {
+    const { emit } = getCurrentInstance();
     const router = useRouter();
 
     const showModal = ref(false);

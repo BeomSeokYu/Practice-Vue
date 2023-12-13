@@ -22,10 +22,11 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { getCurrentInstance, ref } from 'vue';
 export default {
     emits: ['add-todo'],
-    setup(props, { emit }) {
+    setup() {
+        const { emit } = getCurrentInstance();
         const todo = ref('');
         const hasError = ref(false);
 
