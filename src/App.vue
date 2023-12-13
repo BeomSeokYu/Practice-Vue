@@ -13,42 +13,16 @@
 <div class="container">
   <router-view></router-view>
 </div>
-<transition name="fade">
-  <Toast
-    v-if="showToast"
-    :message="toastMessage"
-    :isError="isToastError"/>
-</transition>
+<Toast />
 </template>
 
 <script>
 import Toast from '@/components/Toast.vue'
-import { useToast } from '@/composables/toast';
 
 export default {
   components: {
     Toast,
   },
-
-  setup() {
-    const {
-      showToast,
-      toastMessage,
-      isToastError,
-      triggerToast,
-      toastTimeout,
-    } = useToast();
-
-    console.log(showToast.value);
-
-    return {
-      showToast,
-      toastMessage,
-      isToastError,
-      triggerToast,
-      toastTimeout,
-    }
-  }
 }
 </script>
 

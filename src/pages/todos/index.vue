@@ -53,28 +53,22 @@
       </ul>
     </nav>
   </div>
-  <transition name="fade">
-    <Toast
-      v-if="showToast"
-      :message="toastMessage"
-      :isError="isToastError"/>
-  </transition>
 </template>
 
 <script>
-import { ref, computed, onMounted, watch, onUnmounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import TodoSimpleForm from '@/components/TodoSimpleForm.vue';
 import TodoList from '@/components/TodoList.vue'
 import axios from '@/axios/axios'
-import Toast from '@/components/Toast.vue'
-import {useToast } from '@/composables/toast'
+// import Toast from '@/components/Toast.vue'
+import { useToast } from '@/composables/toast'
 
 export default {
 
   components: {
     TodoSimpleForm,
     TodoList,
-    Toast
+    // Toast
   },
 
   setup() {
@@ -84,15 +78,10 @@ export default {
     const limit = ref(5);
     const currentPage = ref(1);
     const searchText = ref('');
+
     let timeout = null;
 
-    const {
-      showToast,
-      toastMessage,
-      isToastError,
-      triggerToast,
-      toastTimeout
-    } = useToast();
+    const { triggerToast } = useToast();
 
     // const showToast = ref(false);
     // const toastMessage = ref('');
@@ -198,10 +187,6 @@ export default {
       getTodos();
     })
 
-    onUnmounted(() => {
-      clearTimeout(toastTimeout.value);
-    })
-
     return {
       todos,
       // filteredTodos,
@@ -210,14 +195,10 @@ export default {
       toggleTodo,
       deleteTodo,
       searchTodo,
-      triggerToast,
       todoStyle,
       searchText,
       totalPages,
       currentPage,
-      showToast,
-      toastMessage,
-      isToastError,
     }
   }
 }

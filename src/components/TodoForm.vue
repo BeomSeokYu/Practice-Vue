@@ -73,12 +73,6 @@
         </div>
     </div>
   </form>
-  <transition name="fade">
-      <Toast
-        v-if="showToast"
-        :message="toastMessage"
-        :isError="isToastError"/>
-  </transition>
     <modal
         v-if="showModal"
         @close="closeModal"
@@ -89,9 +83,9 @@
 <script>
 import axios from '@/axios/axios';
 import { useRoute, useRouter } from 'vue-router'
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import _ from 'lodash';
-import Toast from '@/components/Toast.vue'
+// import Toast from '@/components/Toast.vue'
 import { useToast } from '@/composables/toast';
 import Input from '@/components/Input.vue'
 import Modal from '@/components/Modal.vue'
@@ -99,7 +93,7 @@ import Modal from '@/components/Modal.vue'
 export default {
 
     components: {
-        Toast,
+        // Toast,
         Input,
         Modal
     },
@@ -124,13 +118,7 @@ export default {
 
         const subjectError = ref('')
 
-        const {
-            showToast,
-            toastMessage,
-            isToastError,
-            triggerToast,
-            toastTimeout,
-        } = useToast();
+        const { triggerToast } = useToast();
         // const showToast = ref(false);
         // const toastMessage = ref('');
         // const isToastError = ref(false);
@@ -186,7 +174,7 @@ export default {
                     complated: todo.value.complated,
                     body: todo.value.body
                 });
-                triggerToast("수정이 완료되었습니다.");
+                triggerToast("수정되었습니다.");
                 getTodo()
             } catch (err) {
                 console.error(err);
@@ -239,17 +227,10 @@ export default {
             if (props.editing) getTodo();
         })
 
-        onUnmounted(() => {
-            clearTimeout(toastTimeout.value);
-        })
-
         return {
             todo,
             loading,
             isTodoUpdated,
-            showToast,
-            toastMessage,
-            isToastError,
             subjectError,
             showModal,
             toggleTodoStatus,

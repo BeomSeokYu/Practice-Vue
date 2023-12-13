@@ -4,38 +4,28 @@ import { useStore } from 'vuex'
 export const useToast = () => {
     const store = useStore();
 
-    const showToast = computed(() => {
-        return store.state.showToast
-    })
+    const toasts = computed(() => {
+        return store.state.toast.toasts
+    });
 
-    const toastMessage = computed(() => {
-        return store.state.toastMessage
-    })
+    // const showToast = computed(() => {
+    //     return store.state.toast.showToast
+    // })
 
-    const isToastError = computed(() => {
-        return store.state.isToastError
-    })
+    // const toastMessage = computed(() => {
+    //     return store.state.toast.toastMessage
+    // })
 
-    const toastTimeout = computed(() => {
-        return store.state.toastTimeout
-    })
+    // const isToastError = computed(() => {
+    //     return store.state.toast.isToastError
+    // })
 
     const triggerToast = (message, isError = false) => {
-        toastMessage.value = message
-        isToastError.value = isError
-        showToast.value = true;
-        toastTimeout.value =  setTimeout(() => {
-            toastMessage.value = ''
-            isToastError.value = false
-            showToast.value = false;
-        }, 3000)
+        store.dispatch('toast/triggerToast', message, isError);
     }
 
     return {
-        showToast,
-        toastMessage,
-        isToastError,
-        toastTimeout,
+        toasts,
         triggerToast,
     }
 }
