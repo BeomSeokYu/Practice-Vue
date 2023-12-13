@@ -29,29 +29,11 @@
       @toggle-todo="toggleTodo"
       @delete-todo="deleteTodo"/>
 
-    <nav class="mt-2">
-      <ul class="pagination">
-        <li
-          class="page-item"
-          :class="currentPage === 1 ? 'disabled' : ''"
-          @click="currentPage > 1 ? getTodos(currentPage - 1) : null"
-        ><a class="page-link" href="#">Prev</a>
-        </li>
-        <li
-          class="page-item"
-          v-for="page in totalPages"
-          :class="currentPage === page ? 'active' : ''"
-          :key="page">
-          <a class="page-link" @click="getTodos(page)">{{ page }}</a>
-        </li>
-        <li
-          class="page-item"
-          :class="currentPage === totalPages ? 'disabled' : ''"
-          @click="currentPage < totalPages ? getTodos(currentPage + 1) : null"
-          ><a class="page-link" href="#">Next</a>
-        </li>
-      </ul>
-    </nav>
+    <Pagination
+      v-if="todos.length"
+      :totalPages="totalPages"
+      :currentPage="currentPage"
+      @click="getTodos"/>
   </div>
 </template>
 
@@ -59,8 +41,8 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import TodoSimpleForm from '@/components/TodoSimpleForm.vue';
 import TodoList from '@/components/TodoList.vue'
+import Pagination from "@/components/Pagination.vue";
 import axios from '@/axios/axios'
-// import Toast from '@/components/Toast.vue'
 import { useToast } from '@/composables/toast'
 
 export default {
@@ -68,7 +50,7 @@ export default {
   components: {
     TodoSimpleForm,
     TodoList,
-    // Toast
+    Pagination,
   },
 
   setup() {

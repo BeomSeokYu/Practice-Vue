@@ -24,14 +24,14 @@ export default {
         }
     },
     actions: {
-        triggerToast({ commit }, message, isError = false) {
+        triggerToast({ commit }, payload) {
             // commit('UPDATE_TOAST_MESSAGE', message);
             // commit('UPDATE_TOAST_IS_ERROR', isError);
             // commit('UPDATE_TOAST_STATUS', true);
             commit('ADD_TOAST', {
                 id: Date.now(),
-                message,
-                isError
+                message: payload.message,
+                isError: payload.isError
             })
 
             setTimeout(() => {

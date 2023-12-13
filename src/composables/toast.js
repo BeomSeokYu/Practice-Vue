@@ -21,7 +21,7 @@ export const useToast = () => {
     // })
 
     const triggerToast = (message, isError = false) => {
-        store.dispatch('toast/triggerToast', message, isError);
+        store.dispatch('toast/triggerToast', {message, isError});
     }
 
     return {
