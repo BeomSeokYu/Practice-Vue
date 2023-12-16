@@ -1,17 +1,25 @@
 <template>
-  <ag-grid-vue
-      :class="isDarkTheme ? 'ag-theme-balham-dark' : 'ag-theme-balham'"
-      :columnDefs="columnDefs"
-      :rowData="rowData"
-      :defaultColDef="defaultColDef"
+  <div style="height: 300px">
+    <ag-grid-vue
+        style="width: 100%; height: 100%;"
+        :class="isDarkTheme ? 'ag-theme-balham-dark' : 'ag-theme-balham'"
+        :columnDefs="columnDefs"
+        :rowData="rowData"
+        :defaultColDef="defaultColDef"
 
-      @grid-ready="onGridReady"
-      @grid-size-changed="onGridSizeChanged"
-      @first-data-rendered="onFirstDataRendered"
+        :pagination="true"
+        :paginateChildRows="true"
+        :paginationPageSize="paginationPageSize"
+        :paginationPageSizeSelector="paginationPageSizeSelector"
 
-      @cell-value-changed="onCellEditRequest"
+        @grid-ready="onGridReady"
+        @grid-size-changed="onGridSizeChanged"
+        @first-data-rendered="onFirstDataRendered"
+
+        @cell-value-changed="onCellEditRequest"
       >
-  </ag-grid-vue>
+    </ag-grid-vue>
+  </div>
 </template>
 
 <script>
@@ -25,11 +33,11 @@ export default {
   props: {
     columnDefs: {
       type: Array,
-      default: () => []
+      default: []
     },
     rowData: {
       type: Array,
-      default: () => []
+      default: []
     },
     isDarkTheme: {
       type: Boolean,
@@ -37,13 +45,20 @@ export default {
     },
     defaultColDef : {
       type: Object,
-      default: () => {
-        return {
-          editable: true,
-          filter: true
-        }
+      default: {
+        editable: true,
+        filter: true,
+        minWidth: 100
       }
     },
+    paginationPageSize: {
+      type: Number,
+      default: 10
+    },
+    paginationPageSizeSelector: {
+      type: Array,
+      default: [1, 2, 3, 4, 5, 10]
+    }
   },
   emits: ['changed-row-data'],
   setup(props, { emit }) {
