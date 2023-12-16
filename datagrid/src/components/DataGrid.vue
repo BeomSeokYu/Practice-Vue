@@ -4,7 +4,6 @@
       :columnDefs="columnDefs"
       :rowData="rowData"
       :defaultColDef="defaultColDef"
-      :getRowId="getRowId"
 
       @grid-ready="onGridReady"
       @grid-size-changed="onGridSizeChanged"
@@ -17,7 +16,7 @@
 
 <script>
 import { AgGridVue } from 'ag-grid-vue3'; // Vue3 AgGrid Component
-import { onBeforeMount, ref } from 'vue';
+import { ref } from 'vue';
 
 export default {
   components: {
@@ -46,11 +45,11 @@ export default {
       }
     },
   },
-  setup() {
+  emits: ['changed-row-data'],
+  setup(props, { emit }) {
 
     const gridApi = ref(null);
     const columnApi = ref(null);
-    const getRowId = ref(null);
 
     const onGridReady = (params) => {
       gridApi.value = params.api;
@@ -65,23 +64,24 @@ export default {
       gridApi.value.sizeColumnsToFit();
     }
 
-    // const onCellEditRequest = (event) => {
-    //   console.log(rowData[event.node.rowIndex]);
-    //   console.log('onCellEditRequest, updating ' + getRowId.value + ' / ' +event.colDef.field + ' to ' + event.newValue);
-    // };
+    const onCellEditRequest = (event) => {
+      // console.log(props.rowData[event.node.rowIndex]);
+      console.log('onCellEditRequest, updating ' + event.colDef.field + ' to ' + event.newValue);
 
-    onBeforeMount(() => {
-      getRowId.value = (params) => params.data.id;
-    });
+      emit('changed-row-data', {
+        id: props.rowData[event.node.rowIndex].id,
+        columnName: event.colDef.field,
+        newValue: event.newValue
+      });
+    };
 
     return {
-      getRowId,
       gridApi,
       columnApi,
       onGridReady,
       onFirstDataRendered,
       onGridSizeChanged,
-      // onCellEditRequest,
+      onCellEditRequest,
     }
   }
 };

@@ -16,6 +16,7 @@
     "vue": "^3.2.13",
     "vue-class-component": "^8.0.0-rc.1",
     "vue-router": "^4.2.5",
+    "vue3-xlsx": "^1.1.2",
     "vuex": "^4.1.0"
   },
   "devDependencies": {
