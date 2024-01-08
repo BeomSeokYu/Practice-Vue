@@ -33,11 +33,11 @@ export default {
   props: {
     columnDefs: {
       type: Array,
-      default: []
+      default: () => []
     },
     rowData: {
       type: Array,
-      default: []
+      default: () => []
     },
     isDarkTheme: {
       type: Boolean,
@@ -45,10 +45,12 @@ export default {
     },
     defaultColDef : {
       type: Object,
-      default: {
-        editable: true,
-        filter: true,
-        minWidth: 100
+      default: () => {
+        return {
+          editable: true,
+          filter: true,
+          minWidth: 100
+        }
       }
     },
     paginationPageSize: {
@@ -57,7 +59,7 @@ export default {
     },
     paginationPageSizeSelector: {
       type: Array,
-      default: [1, 2, 3, 4, 5, 10]
+      default: () => [1, 2, 3, 4, 5, 10]
     }
   },
   emits: ['changed-row-data'],
@@ -81,7 +83,7 @@ export default {
 
     const onCellEditRequest = (event) => {
       // console.log(props.rowData[event.node.rowIndex]);
-      console.log('onCellEditRequest, updating ' + event.colDef.field + ' to ' + event.newValue);
+      // console.log('onCellEditRequest, updating ' + event.colDef.field + ' to ' + event.newValue);
 
       emit('changed-row-data', {
         id: props.rowData[event.node.rowIndex].id,
